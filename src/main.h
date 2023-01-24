@@ -2,5 +2,9 @@
 #define MAIN_H_
 
 #include <Arduino.h>
+#include <console.h>
+#include <led.h>
+#include <button.h>
+#include "def.h"
 
 #endif  /* MAIN_H_ */
