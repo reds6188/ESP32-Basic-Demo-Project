@@ -5,6 +5,8 @@
 #include <console.h>
 #include <rgb-led.h>
 #include <button.h>
+#include <wi-fi.h>
 #include "def.h"
+#include "credentials.h"
 
 #endif  /* MAIN_H_ */

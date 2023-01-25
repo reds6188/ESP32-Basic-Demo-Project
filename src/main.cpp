@@ -22,6 +22,8 @@ void setup() {
 	console.log(MAIN_T, "Compile Time: " + String(__TIME__));
 	console.log(MAIN_T, "ESP32 Chip Model: " + String(ESP.getChipModel()));
 	console.log(MAIN_T, "ESP32 Flash Size: " + String(ESP.getFlashChipSize()));
+	setCredentials(wifi_ssid, wifi_password);
+	initWiFi(WIFI_AP);
 	console.header("END INITIALIZATION", DOUBLE_DASHED, 80);
 	btn1.onPress(toggleRedLed);
 	btn2.onPress(toggleBlueLed);
