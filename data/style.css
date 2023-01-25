@@ -1,0 +1,175 @@
+@import "colors.css";
+
+html {
+  font-family: Helvetica;
+  display: inline-block;
+  margin: 0px auto;
+  text-align: center;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  background-color: #2F2F2F;
+  color: white;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+#logo > img {
+  margin: 10px;
+  filter: invert(100%);
+}
+
+#main {
+  background-color: gray;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.sidebar {
+  height: 100%;
+  width: 80px;
+  position: relative;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  /*padding-top: 16px;*/
+  display: flex;
+  flex-direction: column;
+}
+
+.bar-icon > img {
+  margin: 10px;
+  filter: invert(100%);
+}
+
+.bar-icon:hover {
+  background-color: var(--GreenBlueCrayola);
+}
+
+.selected, .selected:hover{
+  background-color: gray;
+}
+
+.hidden {
+  display: none;
+}
+
+.param-setting {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  column-gap: 20px;
+}
+
+.section {
+  flex: 1;
+}
+
+#color-group {
+  margin: 10px;
+  width: 50%;
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  background-color: lightgrey;
+  border-radius: 5px;
+}
+
+.color-box {
+  height: 60px;
+  width: 60px;
+  margin: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+  /*width: 3em;*/
+  width: 60px;
+  height: 60px;
+  margin: 10px;
+  font-size: 24px;
+  text-align: center;
+  border: 1px solid white;
+  outline: none;
+}
+
+#content {
+  flex: 1;
+  margin: 5px;
+  background-color: gray;
+  color: black;
+  /*overflow-y: scroll;*/
+}
+
+.button {
+  /*background-color: lightgrey;*/
+  display: inline-block;
+  border: none;
+  border-radius: 8px;
+  padding: 16px 40px;
+  text-decoration: none;
+  font-size: 20px;
+  margin: 2px;
+  cursor: pointer;
+}
+
+.icon {
+	vertical-align: middle;
+	height: 42px;
+	filter: invert(100%);
+}
+
+@media only screen and (min-width:1000px) {
+  .header {
+    width: 25%;
+  }
+}
+@media only screen and (max-width:1000px) {
+  .header {
+    width: 100%;
+  }
+}
+
+.spinner {
+  width: 20px;
+  animation-name: spin;
+  animation-duration: 2000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes spin {
+  from {
+      transform:rotate(0deg);
+  }
+  to {
+      transform:rotate(360deg);
+  }
+}
