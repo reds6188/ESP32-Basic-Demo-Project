@@ -15,6 +15,34 @@ void toggleBlueLed(void) {
 	console.log(MAIN_T, "Blue LED was toggled");
 }
 
+String htmlProcessor(const String& var) {
+    console.log(MAIN_T, "var = " + var);
+    String strProc = String();
+	
+	/*
+	Insert here how to process HTML template
+	"var" is the string %PLACEHOLDER_NAME%
+	*/
+
+    console.log(MAIN_T, "strProc = " + strProc);
+	return strProc;
+}
+
+void handleWsMessage(uint8_t *data, size_t len) {
+	StaticJsonDocument<128> json;
+
+	DeserializationError err = deserializeJson(json, data);
+	JsonObject jsonObj = json.as<JsonObject>();
+
+	if(!err) {
+		/*
+		Do something with "jsonObj" object
+		*/
+	}
+	else
+		console.log(WS_T, "Error on parsing JSON content");
+}
+
 void setup() {
 	rgb_led.setColor(C8_BLACK);
 	console.header("START INITIALIZATION", DOUBLE_DASHED, 80);
@@ -24,6 +52,7 @@ void setup() {
 	console.log(MAIN_T, "ESP32 Flash Size: " + String(ESP.getFlashChipSize()));
 	setCredentials(wifi_ssid, wifi_password);
 	initWiFi(WIFI_AP);
+	initWebServer(&htmlProcessor);
 	console.header("END INITIALIZATION", DOUBLE_DASHED, 80);
 	btn1.onPress(toggleRedLed);
 	btn2.onPress(toggleBlueLed);

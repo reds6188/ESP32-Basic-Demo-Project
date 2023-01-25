@@ -8,6 +8,7 @@ Basic Demo Project for ESP32 controller
 * led
 * rgb-led
 * wi-fi
+* web-server
 
 ## Dependencies
 
