@@ -16,7 +16,12 @@ class Led {
         unsigned long time_blink[2];
         bool blink_index;
 	public:
+        Led(void);
+        ~Led(void);
 		Led(int led_pin, led_driver_t led_driver_mode);
+        void setPin(int led_pin);
+        void setDriverMode(led_driver_t led_driver_mode);
+        void setState(uint8_t state);
         void set(void);
         void reset(void);
         void toggle(void);

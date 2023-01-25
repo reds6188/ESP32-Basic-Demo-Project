@@ -1,11 +1,34 @@
 #include "led.h"
 
+Led::Led(void) {
+
+}
+
+Led::~Led(void) {
+
+}
+
 Led::Led(int led_pin, led_driver_t led_driver_mode) {
 	pin = led_pin;
 	driver_mode = led_driver_mode;
 
 	pinMode(pin, OUTPUT);
 	digitalWrite(pin, (driver_mode == LS_DRIVER ? LOW : HIGH));
+}
+
+void Led::setPin(int led_pin) {
+	pin = led_pin;
+	pinMode(pin, OUTPUT);
+	digitalWrite(pin, (driver_mode == LS_DRIVER ? LOW : HIGH));
+}
+
+void Led::setDriverMode(led_driver_t led_driver_mode) {
+	driver_mode = led_driver_mode;
+	digitalWrite(pin, (driver_mode == LS_DRIVER ? LOW : HIGH));
+}
+
+void Led::setState(uint8_t state) {
+	digitalWrite(pin, state);
 }
 
 void Led::set(void) {

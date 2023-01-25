@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <console.h>
-#include <led.h>
+#include <rgb-led.h>
 #include <button.h>
 #include "def.h"
 
