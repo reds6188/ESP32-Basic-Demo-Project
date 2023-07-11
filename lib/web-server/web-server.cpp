@@ -1,7 +1,6 @@
 #include "web-server.h"
 
 AsyncWebServer server(80);
-AsyncWebSocket ws("/ws");
 
 void sendJSON(String action, String func, String value) {
 	StaticJsonDocument<128> doc;
@@ -12,41 +11,6 @@ void sendJSON(String action, String func, String value) {
 	doc["value"] = value;
 
 	serializeJson(doc, msg);
-	wsUpdateMsg(msg);
-}
-
-void wsUpdateMsg(String msg)
-{
-    ws.textAll(msg);
-}
-
-void initWebSocket(void (*handler)(uint8_t *, size_t)) {
-    ws.onEvent([handler](AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
-        AwsFrameInfo *info;
-        switch (type) {
-            case WS_EVT_CONNECT:
-                Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-                break;
-            case WS_EVT_DISCONNECT:
-                Serial.printf("WebSocket client #%u disconnected\n", client->id());
-                break;
-            case WS_EVT_DATA:
-                info = (AwsFrameInfo*)arg;
-                if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-                    data[len] = 0;
-                    handler(data, len);
-                }
-                break;
-            case WS_EVT_PONG:
-            case WS_EVT_ERROR:
-                break;
-        }
-    });
-    server.addHandler(&ws);
-}
-
-void wsCleanupClients(void) {
-    ws.cleanupClients();
 }
 
 void initWebServer(AwsTemplateProcessor callback)
@@ -91,9 +55,14 @@ void initWebServer(AwsTemplateProcessor callback)
         request->send(SPIFFS, "/index.html", String(), false, callback);
     });
 
+    server.on("/status", HTTP_GET, [callback](AsyncWebServerRequest *request) {
+        console.log(HTTP_T, "Status request");
+        request->send(200, "text/json", "{\"name\": \"Hello world\"}");
+    });
+
     server.onNotFound([](AsyncWebServerRequest *request){
-        request->send(404, "text/plain", "ERROR 404 - The content you are looking for was not found.");
         console.log(HTTP_T, "ERROR 404 - The content you are looking for was not found.");
+        request->send(404, "text/plain", "ERROR 404 - The content you are looking for was not found.");
     });
 
     // Start server

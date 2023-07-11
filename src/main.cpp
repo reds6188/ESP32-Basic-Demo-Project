@@ -28,6 +28,7 @@ String htmlProcessor(const String& var) {
 	return strProc;
 }
 
+/*
 void handleWsMessage(uint8_t *data, size_t len) {
 	StaticJsonDocument<128> json;
 
@@ -35,13 +36,11 @@ void handleWsMessage(uint8_t *data, size_t len) {
 	JsonObject jsonObj = json.as<JsonObject>();
 
 	if(!err) {
-		/*
-		Do something with "jsonObj" object
-		*/
 	}
 	else
 		console.log(WS_T, "Error on parsing JSON content");
 }
+*/
 
 void setup() {
 	rgb_led.setColor(C8_BLACK);
@@ -51,7 +50,7 @@ void setup() {
 	console.log(MAIN_T, "ESP32 Chip Model: " + String(ESP.getChipModel()));
 	console.log(MAIN_T, "ESP32 Flash Size: " + String(ESP.getFlashChipSize()));
 	setCredentials(wifi_ssid, wifi_password);
-	initWiFi(WIFI_AP);
+	initWiFi(WIFI_STA);
 	initWebServer(&htmlProcessor);
 	console.header("END INITIALIZATION", DOUBLE_DASHED, 80);
 	btn1.onPress(toggleRedLed);
