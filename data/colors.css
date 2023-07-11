@@ -5,6 +5,7 @@
     --AppleGreen: #7fb800;
     --AppleGreen-Light: #dfff99;
     --OxfordBlue: #0d2c54;
+    --CornYellow: #fbec5d;
     --SelectiveYellow: #ffba08;
     --DeepSaffron: #f39237;
     --RossoCorsa: #d00000;
@@ -59,4 +60,14 @@
 .red:active, .red:hover {
     background-color: #f5b7b1;
     color: white;
+}
+
+.ylw {
+    background-color: var(--CornYellow);
+    color: black;
+}
+
+.ylw:active, .ylw:hover {
+    background-color: var(--CornYellow);
+    color: black;
 }
