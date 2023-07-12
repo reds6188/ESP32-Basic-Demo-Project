@@ -81,9 +81,66 @@ void Console::log(String tag, String message) {
 	newLine();
 }
 
+// Terminal text in green -------------------------------------------
+void Console::success(String tag, String message) {
+	Serial.print(F("\033[1;32m"));
+	write(tag, message);
+	Serial.print(F("\033[0m"));
+	newLine();
+}
+
+// Terminal text in blue --------------------------------------------
+void Console::info(String tag, String message) {
+	Serial.print(F("\033[1;34m"));
+	write(tag, message);
+	Serial.print(F("\033[0m"));
+	newLine();
+}
+
+// Terminal text in yellow ------------------------------------------
+void Console::warning(String tag, String message) {
+	Serial.print(F("\033[1;33m"));
+	write(tag, message);
+	Serial.print(F("\033[0m"));
+	newLine();
+}
+
+// Terminal text in red ---------------------------------------------
+void Console::error(String tag, String message) {
+	Serial.print(F("\033[1;31m"));
+	write(tag, message);
+	Serial.print(F("\033[0m"));
+	newLine();
+}
+
+// Terminal text in magenta -----------------------------------------
+void Console::command(String tag, String message) {
+	Serial.print(F("\033[1;35m"));
+	write(tag, message);
+	Serial.print(F("\033[0m"));
+	newLine();
+}
+
+// Terminal text in cyan --------------------------------------------
+void Console::data(String tag, String message) {
+	Serial.print(F("\033[1;36m"));
+	write(tag, message);
+	Serial.print(F("\033[0m"));
+	newLine();
+}
+
 void Console::newLine(void) {
 	this->tag_written = false;
 	Serial.println();
+}
+
+// Terminal text in red ---------------------------------------------
+void Console::heap(String message) {
+	String heap = " ( Free = " + String(ESP.getFreeHeap());
+	heap += " - Total = " + String(ESP.getHeapSize());
+	heap += " - Min. = " + String(ESP.getMinFreeHeap()) + " )";
+	write(HEAP_T, message + heap);
+	newLine();
 }
 
 Console console;

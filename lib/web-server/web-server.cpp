@@ -2,18 +2,6 @@
 
 AsyncWebServer server(80);
 
-void sendJSON(String action, String func, String value) {
-	StaticJsonDocument<128> doc;
-	String msg;
-
-	doc["action"] = action;
-    doc["function"] = func;
-	doc["value"] = value;
-
-	serializeJson(doc, msg);
-}
-
-//void initWebServer(AwsTemplateProcessor callback)
 void initWebServer(String (*func)(void))
 {
     if(!SPIFFS.begin(true))

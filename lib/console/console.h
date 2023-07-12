@@ -26,7 +26,14 @@ class Console {
         void writeTag(String tag);
 		void write(String tag, String message);
         void log(String tag, String str);
+        void success(String tag, String str);
+        void info(String tag, String str);
+        void warning(String tag, String str);
+        void error(String tag, String message);
+        void command(String tag, String message);
+        void data(String tag, String message);
         void newLine(void);
+        void heap(String message);
 };
 
 extern Console console;
