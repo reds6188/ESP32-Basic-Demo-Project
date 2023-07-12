@@ -7,6 +7,10 @@ RgbLed rgb_led(R_LED_PIN, G_LED_PIN, B_LED_PIN, LS_DRIVER);
 Button btn1(BTN_1_PIN, 80);
 Button btn2(BTN_2_PIN, 80);
 
+// Declarations for timestamp
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+
 void toggleRedLed(void) {
 	rgb_led.setBlink(C8_RED, C8_BLACK, 500, 500);
 	console.log(MAIN_T, "Red LED was toggled");
@@ -31,13 +35,18 @@ String htmlProcessor(const String& var) {
 }
 
 String getParams(void) {
-	StaticJsonDocument<64> doc;
+	StaticJsonDocument<128> doc;
 	String msg;
+	long long timestamp;
+
+	timeClient.update();
+    timestamp = timeClient.getEpochTime();
 
 	float temperature = bme.readTemperature();
 	float pressure = bme.readPressure() / 100.0F;
 	float humidity = bme.readHumidity();
 
+	doc["timestamp"] = timestamp * 1000;
 	doc["temperature"] = temperature;
     doc["pressure"] = pressure;
 	doc["humidity"] = humidity;
@@ -45,20 +54,6 @@ String getParams(void) {
 	serializeJson(doc, msg);
 	return msg;
 }
-
-/*
-void handleWsMessage(uint8_t *data, size_t len) {
-	StaticJsonDocument<128> json;
-
-	DeserializationError err = deserializeJson(json, data);
-	JsonObject jsonObj = json.as<JsonObject>();
-
-	if(!err) {
-	}
-	else
-		console.log(WS_T, "Error on parsing JSON content");
-}
-*/
 
 void setup() {
 	rgb_led.setColor(C8_BLACK);

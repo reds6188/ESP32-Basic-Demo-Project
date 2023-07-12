@@ -27,6 +27,8 @@ function polling(delay) {
             getData(`/status`).then((data) => {
             showLoadingPage(false);
             console.log(data);
+            const date = new Date(data.timestamp);
+            document.getElementById("timestamp").innerText = date.toLocaleString('it-IT');
             document.getElementById("temperature").innerText = `${data.temperature.toFixed(1)}°C`
             document.getElementById("pressure").innerText = `${data.pressure.toFixed(1)} hPa`
             document.getElementById("humidity").innerText = `${data.humidity.toFixed(1)} %`

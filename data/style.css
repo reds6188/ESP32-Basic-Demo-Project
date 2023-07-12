@@ -38,11 +38,19 @@ body {
 
 .data {
   margin: 10px;
+  background-color: #483D8B;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.title-field {
+  margin: 20px;
+  font-size: 20px;
 }
 
 .data-field {
   margin-left: 10px;
-  font-size: 20px;
+  font-size: 28px;
 }
 
 @keyframes fade {
@@ -70,6 +78,8 @@ body {
 
 #page {
   height: 100vh;
+  width: 30%;
+  margin: auto;
   flex-direction: column;
   align-items: stretch;
 }

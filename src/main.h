@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <NTPClient.h>
 #include <Adafruit_BME280.h>
 #include <console.h>
 #include <rgb-led.h>
