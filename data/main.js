@@ -1,3 +1,19 @@
+function showLoadingPage (show) {
+    let page = document.getElementById('page');
+    let loading = document.getElementById('loading');
+
+    if(show === true) {
+        // Hide the content and show loading page
+        page.classList.replace('flex', 'hidden');
+        loading.classList.replace('hidden', 'flex');
+    }
+    else {
+        // Hide loading page and show the content
+        loading.classList.replace('flex', 'hidden');
+        page.classList.replace('hidden', 'flex');
+    }
+}
+
 async function getData(url = "") {
     const response = await fetch(url, {
         method: "GET",
@@ -9,10 +25,15 @@ function polling(delay) {
     setTimeout(() => {
         console.log('request data...')
             getData(`/status`).then((data) => {
+            showLoadingPage(false);
             console.log(data);
+            document.getElementById("temperature").innerText = `${data.temperature.toFixed(1)}°C`
+            document.getElementById("pressure").innerText = `${data.pressure.toFixed(1)} hPa`
+            document.getElementById("humidity").innerText = `${data.humidity.toFixed(1)} %`
             setTimeout(polling, delay, delay);
         }).catch((err) => {
             console.error(err);
+            showLoadingPage(true);
             setTimeout(polling, delay, delay);
         });
     }, delay)

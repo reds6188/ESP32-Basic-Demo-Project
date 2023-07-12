@@ -11,24 +11,20 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="#2F2F2F">
   <!--<link rel="icon" href="/favicon.ico"/>-->
   <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.min.js" integrity="sha512-mlz/Fs1VtBou2TrUkGzX4VoGvybkD9nkeXWJm3rle0DPHssYYx4j+8kIS15T78ttGfmOjH0lLaBXGcShaVkdkg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <!-- <script src="main.js"></script> -->
 </head>
 <body>
-  <div class="container">
+  <div id="loading" class="flex">
+    <img class="icon" src="svg/spinner.svg">
+  </div>
+  <div id="page" class="hidden">
     <header id="logo">
       ESP32 Basic Demo Project
     </header>
-  </div>
-  <div class="combo-box">
-    <div class="selected">
-      <div class="square ylw"></div> Yellow
-    </div>
-    <ul class="dropdown">
-      <!-- <li class="init">[SELECT]</li> -->
-      <li data-value="value 1"><div class="square blu"></div> Blue</li>
-      <li data-value="value 2"><div class="square red"></div> Red</li>
-      <li data-value="value 3"><div class="square grn"></div> Green</li>
-    </ul>
+    <div class="data"><img class="icon" src=svg/thermometer-half.svg><span class="data-field" id="temperature">- °C</span></div>
+    <div class="data"><img class="icon" src=svg/tint.svg><span class="data-field" id="humidity">- %</span></div>
+    <div class="data"><img class="icon" src=svg/barometer.svg><span class="data-field" id="pressure">- hPa</span></div>
   </div>
 </body>
 <script src="main.js"></script>

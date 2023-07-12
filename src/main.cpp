@@ -1,5 +1,7 @@
 #include "main.h"
 
+Adafruit_BME280 bme; // I2C
+
 RgbLed rgb_led(R_LED_PIN, G_LED_PIN, B_LED_PIN, LS_DRIVER);
 
 Button btn1(BTN_1_PIN, 80);
@@ -28,6 +30,22 @@ String htmlProcessor(const String& var) {
 	return strProc;
 }
 
+String getParams(void) {
+	StaticJsonDocument<64> doc;
+	String msg;
+
+	float temperature = bme.readTemperature();
+	float pressure = bme.readPressure() / 100.0F;
+	float humidity = bme.readHumidity();
+
+	doc["temperature"] = temperature;
+    doc["pressure"] = pressure;
+	doc["humidity"] = humidity;
+
+	serializeJson(doc, msg);
+	return msg;
+}
+
 /*
 void handleWsMessage(uint8_t *data, size_t len) {
 	StaticJsonDocument<128> json;
@@ -51,7 +69,9 @@ void setup() {
 	console.log(MAIN_T, "ESP32 Flash Size: " + String(ESP.getFlashChipSize()));
 	setCredentials(wifi_ssid, wifi_password);
 	initWiFi(WIFI_STA);
-	initWebServer(&htmlProcessor);
+	//initWebServer(&htmlProcessor);
+	initWebServer(getParams);
+	bool status = bme.begin(0x76);
 	console.header("END INITIALIZATION", DOUBLE_DASHED, 80);
 	btn1.onPress(toggleRedLed);
 	btn2.onPress(toggleBlueLed);

@@ -8,7 +8,8 @@
 #include <console.h>
 
 String processor(const String& var);
-extern void initWebServer(AwsTemplateProcessor callback);
+//extern void initWebServer(AwsTemplateProcessor callback);
+extern void initWebServer(String (*func)(void));
 void sendJSON(String action, String func, String value);
 
 #endif  /* WEB_SERVER_H_ */

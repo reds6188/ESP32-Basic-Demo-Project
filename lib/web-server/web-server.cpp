@@ -13,7 +13,8 @@ void sendJSON(String action, String func, String value) {
 	serializeJson(doc, msg);
 }
 
-void initWebServer(AwsTemplateProcessor callback)
+//void initWebServer(AwsTemplateProcessor callback)
+void initWebServer(String (*func)(void))
 {
     if(!SPIFFS.begin(true))
     {
@@ -49,15 +50,18 @@ void initWebServer(AwsTemplateProcessor callback)
     });
 
     // Route for root / web page
-    server.on("/", HTTP_GET, [callback](AsyncWebServerRequest *request){
+    //server.on("/", HTTP_GET, [callback](AsyncWebServerRequest *request){
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         console.log(HTTP_T, "Serving index.html");
-        //request->send(SPIFFS, "/index.html", "text/html");
-        request->send(SPIFFS, "/index.html", String(), false, callback);
+        request->send(SPIFFS, "/index.html", "text/html");
+        //request->send(SPIFFS, "/index.html", String(), false, callback);
     });
 
-    server.on("/status", HTTP_GET, [callback](AsyncWebServerRequest *request) {
+    server.on("/status", HTTP_GET, [func](AsyncWebServerRequest *request) {
         console.log(HTTP_T, "Status request");
-        request->send(200, "text/json", "{\"name\": \"Hello world\"}");
+        String payload = func();
+        console.log(HTTP_T, payload);
+        request->send(200, "text/json", payload);
     });
 
     server.onNotFound([](AsyncWebServerRequest *request){
