@@ -8,6 +8,6 @@
 
 #define HTTP_T      "HTTP"  // HTTP console tag
 
-extern void initWebServer(String (*func)(void));
+extern void initWebServer(String (*func)(String));
 
 #endif  /* WEB_SERVER_H_ */

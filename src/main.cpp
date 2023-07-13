@@ -34,22 +34,30 @@ String htmlProcessor(const String& var) {
 	return strProc;
 }
 
-String getParams(void) {
+String getParams(String command) {
 	StaticJsonDocument<128> doc;
 	String msg;
-	long long timestamp;
 
-	timeClient.update();
-    timestamp = timeClient.getEpochTime();
+	if(command.equals("status")) {
+		timeClient.update();
+		long long timestamp = timeClient.getEpochTime();
 
-	float temperature = bme.readTemperature();
-	float pressure = bme.readPressure() / 100.0F;
-	float humidity = bme.readHumidity();
+		float temperature = bme.readTemperature();
+		float pressure = bme.readPressure() / 100.0F;
+		float humidity = bme.readHumidity();
 
-	doc["timestamp"] = timestamp * 1000;
-	doc["temperature"] = temperature;
-    doc["pressure"] = pressure;
-	doc["humidity"] = humidity;
+		doc["timestamp"] = timestamp * 1000;
+		doc["temperature"] = temperature;
+		doc["pressure"] = pressure;
+		doc["humidity"] = humidity;
+	}
+	else if(command.equals("version")) {
+		doc["version"] = String(VERSION);
+		doc["date"] = String(__DATE__);
+	}
+	else {
+		doc["info"] = "Command not recognized";
+	}
 
 	serializeJson(doc, msg);
 	return msg;
@@ -58,12 +66,13 @@ String getParams(void) {
 void setup() {
 	rgb_led.setColor(C8_BLACK);
 	console.header("START INITIALIZATION", DOUBLE_DASHED, 80);
-	console.log(MAIN_T, "Compile Date: " + String(__DATE__));
-	console.log(MAIN_T, "Compile Time: " + String(__TIME__));
-	console.log(MAIN_T, "ESP32 Chip Model: " + String(ESP.getChipModel()));
-	console.log(MAIN_T, "ESP32 Flash Size: " + String(ESP.getFlashChipSize()));
+	console.info(MAIN_T, "ESP32 Chip Model: " + String(ESP.getChipModel()));
+	console.info(MAIN_T, "ESP32 Flash Size: " + String(ESP.getFlashChipSize()));
+	console.info(MAIN_T, "Software Version: " + String(VERSION));
+	console.info(MAIN_T, "Compile Date: " + String(__DATE__));
+	console.info(MAIN_T, "Compile Time: " + String(__TIME__));
 	setCredentials(wifi_ssid, wifi_password);
-	initWiFi(WIFI_STA);
+	initWiFi(WIFI_STA, "fairwind");
 	//initWebServer(&htmlProcessor);
 	initWebServer(getParams);
 	bool status = bme.begin(0x76);

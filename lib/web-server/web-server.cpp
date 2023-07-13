@@ -2,7 +2,7 @@
 
 AsyncWebServer server(80);
 
-void initWebServer(String (*func)(void))
+void initWebServer(String (*func)(String))
 {
     if(!SPIFFS.begin(true))
     {
@@ -47,7 +47,14 @@ void initWebServer(String (*func)(void))
 
     server.on("/status", HTTP_GET, [func](AsyncWebServerRequest *request) {
         console.log(HTTP_T, "Status request");
-        String payload = func();
+        String payload = func("status");
+        console.log(HTTP_T, payload);
+        request->send(200, "text/json", payload);
+    });
+
+        server.on("/version", HTTP_GET, [func](AsyncWebServerRequest *request) {
+        console.log(HTTP_T, "Status request");
+        String payload = func("version");
         console.log(HTTP_T, payload);
         request->send(200, "text/json", payload);
     });

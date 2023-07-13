@@ -10,6 +10,7 @@
 
 void setCredentials(const char* new_ssid, const char* new_pswd);
 void scanNetworks(void);
-void initWiFi(wifi_mode_t mode);
+//void initWiFi(wifi_mode_t mode);
+void initWiFi(wifi_mode_t mode, const char* host_name);
 
 #endif  /* WI_FI_H_ */

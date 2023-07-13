@@ -24,7 +24,7 @@ async function getData(url = "") {
 function polling(delay) {
     setTimeout(() => {
         console.log('request data...')
-            getData(`/status`).then((data) => {
+        getData(`/status`).then((data) => {
             showLoadingPage(false);
             console.log(data);
             const date = new Date(data.timestamp);
@@ -41,4 +41,17 @@ function polling(delay) {
     }, delay)
 }
 
-polling(500);
+//polling(500);
+
+window.addEventListener('load', onLoad);
+
+function onLoad(event) {
+    getData(`/version`).then((data) => {
+        document.getElementById("footer").innerText = `${data.version} (${data.date})`;
+        polling(500);
+    }).catch((err) => {
+        console.error(err);
+        polling(500);
+    });
+}
+
