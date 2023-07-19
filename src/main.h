@@ -13,4 +13,10 @@
 #include "def.h"
 #include "credentials.h"
 
+typedef struct {
+    float current;
+    float min;
+    float max;
+}weather_t;
+
 #endif  /* MAIN_H_ */

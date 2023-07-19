@@ -2,6 +2,8 @@
 
 Adafruit_BME280 bme; // I2C
 
+weather_t temperature, pressure, humidity;
+
 RgbLed rgb_led(R_LED_PIN, G_LED_PIN, B_LED_PIN, LS_DRIVER);
 
 Button btn1(BTN_1_PIN, 80);
@@ -34,22 +36,69 @@ String htmlProcessor(const String& var) {
 	return strProc;
 }
 
+double roundFloat(double value) {
+   return (int)(value * 100 + 0.5) / 100.0;
+}
+
+void initParams(void) {
+	temperature.current = bme.readTemperature();
+	temperature.min = temperature.current;
+	temperature.max = temperature.current;
+
+	pressure.current = bme.readPressure() / 100.0F;
+	pressure.min = pressure.current;
+	pressure.max = pressure.current;
+
+	humidity.current = bme.readHumidity();
+	humidity.min = humidity.current;
+	humidity.max = humidity.current;
+}
+
 String getParams(String command) {
-	StaticJsonDocument<128> doc;
+	StaticJsonDocument<384> doc;
 	String msg;
 
 	if(command.equals("status")) {
 		timeClient.update();
 		long long timestamp = timeClient.getEpochTime();
 
-		float temperature = bme.readTemperature();
-		float pressure = bme.readPressure() / 100.0F;
-		float humidity = bme.readHumidity();
+		// Read temperature
+		temperature.current = roundFloat(bme.readTemperature());
+		if(temperature.current < temperature.min)
+			temperature.min = temperature.current;
+		else if(temperature.current > temperature.max)
+			temperature.max = temperature.current;
+
+		// Read pressure
+		pressure.current = roundFloat(bme.readPressure() / 100.0F);
+		if(pressure.current < pressure.min)
+			pressure.min = pressure.current;
+		else if(pressure.current > pressure.max)
+			pressure.max = pressure.current;
+
+		// Read humidity
+		humidity.current = roundFloat(bme.readHumidity());
+		if(humidity.current < humidity.min)
+			humidity.min = humidity.current;
+		else if(humidity.current > humidity.max)
+			humidity.max = humidity.current;
 
 		doc["timestamp"] = timestamp * 1000;
-		doc["temperature"] = temperature;
-		doc["pressure"] = pressure;
-		doc["humidity"] = humidity;
+
+		JsonObject temp = doc.createNestedObject("temperature");
+		temp["current"] = String(temperature.current, 1);
+		temp["min"] = String(temperature.min, 1);
+		temp["max"] = String(temperature.max, 1);
+
+		JsonObject pres = doc.createNestedObject("pressure");
+		pres["current"] = String(pressure.current, 1);
+		pres["min"] = String(pressure.min, 1);
+		pres["max"] = String(pressure.max, 1);
+
+		JsonObject humi = doc.createNestedObject("humidity");
+		humi["current"] = String(humidity.current, 1);
+		humi["min"] = String(humidity.min, 1);
+		humi["max"] = String(humidity.max, 1);
 	}
 	else if(command.equals("version")) {
 		doc["version"] = String(VERSION);
@@ -76,6 +125,7 @@ void setup() {
 	//initWebServer(&htmlProcessor);
 	initWebServer(getParams);
 	bool status = bme.begin(0x76);
+	initParams();
 	console.header("END INITIALIZATION", DOUBLE_DASHED, 80);
 	btn1.onPress(toggleRedLed);
 	btn2.onPress(toggleBlueLed);

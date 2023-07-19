@@ -1,3 +1,15 @@
+//const HOST_NAME = `http://127.0.0.1:3000`;
+const HOST_NAME = ``;
+const STATUS = `${HOST_NAME}/status`;
+const VERSION = `${HOST_NAME}/version`;
+
+const units = {
+    temperature: '°C',
+    humidity: '%',
+    pressure: 'hPa'
+};
+
+
 function showLoadingPage (show) {
     let page = document.getElementById('page');
     let loading = document.getElementById('loading');
@@ -17,21 +29,31 @@ function showLoadingPage (show) {
 async function getData(url = "") {
     const response = await fetch(url, {
         method: "GET",
+        //mode: "cors",
     });
-    return response.json();
+    console.log(response.body);
+    return response.body == null ? {} : response.json();
 }
 
 function polling(delay) {
     setTimeout(() => {
         console.log('request data...')
-        getData(`/status`).then((data) => {
+        getData(STATUS)/*.then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error: ${response.status}`);
+            }
+            return response.json();
+        })*/.then((data) => {
             showLoadingPage(false);
             console.log(data);
             const date = new Date(data.timestamp);
             document.getElementById("timestamp").innerText = date.toLocaleString('it-IT');
-            document.getElementById("temperature").innerText = `${data.temperature.toFixed(1)}°C`
-            document.getElementById("pressure").innerText = `${data.pressure.toFixed(1)} hPa`
-            document.getElementById("humidity").innerText = `${data.humidity.toFixed(1)} %`
+            for(element of document.querySelectorAll('.data')) {
+                const id = element.id
+                element.querySelector('.value-curr').innerText = `${data[id].current} ${units[id]}`;
+                element.querySelector('.value-min').innerText = `${data[id].min} ${units[id]}`;
+                element.querySelector('.value-max').innerText = `${data[id].max} ${units[id]}`;
+            }
             setTimeout(polling, delay, delay);
         }).catch((err) => {
             console.error(err);
@@ -46,7 +68,7 @@ function polling(delay) {
 window.addEventListener('load', onLoad);
 
 function onLoad(event) {
-    getData(`/version`).then((data) => {
+    getData(VERSION).then((data) => {
         document.getElementById("footer").innerText = `${data.version} (${data.date})`;
         polling(500);
     }).catch((err) => {

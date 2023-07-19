@@ -22,9 +22,48 @@
       ESP32 Basic Demo Project
     </header>
     <div id="timestamp" class="title-field">-</div>
-    <div class="data"><img class="icon" src=svg/thermometer-half.svg><span class="data-field" id="temperature">- °C</span></div>
-    <div class="data"><img class="icon" src=svg/tint.svg><span class="data-field" id="humidity">- %</span></div>
-    <div class="data"><img class="icon" src=svg/barometer.svg><span class="data-field" id="pressure">- hPa</span></div>
+    <div class="data flex" id="temperature">
+      <div class="icon-box"><img class="icon" src="svg/thermometer-half.svg"></div>
+      <div class="value-curr">- °C</div>
+      <div class="min-max">
+        <div class="flex-row">
+          <img class="icon-mini" src="svg/caret-up.svg">
+          <div class="value-max">- °C</div>
+        </div>
+        <div class="flex-row">
+          <img class="icon-mini" src="svg/caret-down.svg">
+          <div class="value-min">- °C</div>
+        </div>
+      </div>
+    </div>
+    <div class="data flex" id="humidity">
+      <div class="icon-box"><img class="icon" src="svg/tint.svg"></div>
+      <div class="value-curr">- %</div>
+      <div class="min-max">
+        <div class="flex-row">
+          <div><img class="icon-mini" src="svg/caret-up.svg"></div>
+          <div class="value-max">- %</div>
+        </div>
+        <div class="flex-row">
+          <div><img class="icon-mini" src="svg/caret-down.svg"></div>
+          <div class="value-min">- %</div>
+        </div>
+      </div>
+    </div>
+    <div class="data flex" id="pressure">
+      <div class="icon-box"><img class="icon" src="svg/barometer.svg"></div>
+      <div class="value-curr">- hPa</div>
+      <div class="min-max">
+        <div class="flex-row">
+          <div><img class="icon-mini" src="svg/caret-up.svg"></div>
+          <div class="value-max">- hPa</div>
+        </div>
+        <div class="flex-row">
+          <div><img class="icon-mini" src="svg/caret-down.svg"></div>
+          <div class="value-min">- hPa</div>
+        </div>
+      </div>
+    </div>
     <footer id="footer"></footer>
   </div>
 </body>
