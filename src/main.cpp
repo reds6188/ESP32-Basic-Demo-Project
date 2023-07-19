@@ -1,7 +1,9 @@
 #include "main.h"
 
 Adafruit_BME280 bme; // I2C
-
+WiFiHandler wifi_handler(wifi_ssid, wifi_password);
+MqttClient	mqtt_client;
+Timer TimerIdle;
 weather_t temperature, pressure, humidity;
 
 RgbLed rgb_led(R_LED_PIN, G_LED_PIN, B_LED_PIN, LS_DRIVER);
@@ -10,8 +12,8 @@ Button btn1(BTN_1_PIN, 80);
 Button btn2(BTN_2_PIN, 80);
 
 // Declarations for timestamp
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
+//WiFiUDP ntpUDP;
+//NTPClient timeClient(ntpUDP);
 
 void toggleRedLed(void) {
 	rgb_led.setBlink(C8_RED, C8_BLACK, 500, 500);
@@ -55,12 +57,15 @@ void initParams(void) {
 }
 
 String getParams(String command) {
-	StaticJsonDocument<384> doc;
+	//StaticJsonDocument<384> doc;
+	DynamicJsonDocument doc(384);
 	String msg;
 
 	if(command.equals("status")) {
+		/*
 		timeClient.update();
 		long long timestamp = timeClient.getEpochTime();
+		*/
 
 		// Read temperature
 		temperature.current = roundFloat(bme.readTemperature());
@@ -83,7 +88,8 @@ String getParams(String command) {
 		else if(humidity.current > humidity.max)
 			humidity.max = humidity.current;
 
-		doc["timestamp"] = timestamp * 1000;
+		//doc["timestamp"] = timestamp * 1000;
+		doc["timestamp"] = mqtt_client.getTimestamp();
 
 		JsonObject temp = doc.createNestedObject("temperature");
 		temp["current"] = String(temperature.current, 1);
@@ -120,9 +126,8 @@ void setup() {
 	console.info(MAIN_T, "Software Version: " + String(VERSION));
 	console.info(MAIN_T, "Compile Date: " + String(__DATE__));
 	console.info(MAIN_T, "Compile Time: " + String(__TIME__));
-	setCredentials(wifi_ssid, wifi_password);
-	initWiFi(WIFI_STA, "fairwind");
-	//initWebServer(&htmlProcessor);
+	wifi_handler.begin(WIFI_STA, "fairwind");
+	mqtt_client.begin();
 	initWebServer(getParams);
 	bool status = bme.begin(0x76);
 	initParams();
@@ -136,4 +141,12 @@ void loop() {
 	btn1.loop();
 	btn2.loop();
 	rgb_led.loop();
+
+	if(TimerIdle.elapsedX1ms(50)) {
+		TimerIdle.trigger();
+		wifi_handler.loop();
+		if(wifi_handler.connected()) {
+			mqtt_client.loop();
+		}
+	}
 }

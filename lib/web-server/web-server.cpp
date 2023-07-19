@@ -4,7 +4,7 @@ AsyncWebServer server(80);
 
 void initWebServer(String (*func)(String))
 {
-    if(!SPIFFS.begin(true))
+    if(!SPIFFS.begin())
     {
         console.log(HTTP_T, "An Error has occurred while mounting SPIFFS");
         return;

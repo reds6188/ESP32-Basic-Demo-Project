@@ -14,7 +14,6 @@
 #define HEAP_T      "HEAP"
 #define I2C_T		"I2C"
 #define MAIN_T		"MAIN"
-#define MQTT_T		"MQTT"
 #define SERIAL2		"SERIAL"
 #define UART_T		"UART"
 #define UART1_T		"UART1"

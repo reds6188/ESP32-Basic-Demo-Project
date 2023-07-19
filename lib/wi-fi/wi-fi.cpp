@@ -1,37 +1,98 @@
 #include "wi-fi.h"
-#include <ESPmDNS.h>
 
 char ssid[100];
 char password[100];
 
 long start_wifi_millis;
 
-void setCredentials(const char* new_ssid, const char* new_pswd)
-{
-    strcpy(ssid, new_ssid);
-    strcpy(password, new_pswd);
-    console.log(WIFI_T, "Credentials was set successfully!");
-    console.log(WIFI_T, "New SSID is: " + String(ssid));
+WiFiHandler::WiFiHandler(const char* ssid, const char* password) {
+	strcpy(this->ssid, ssid);
+	strcpy(this->password, password);
 }
 
-bool checkConnection(void)
-{
-    start_wifi_millis = millis();
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED)
+void WiFiHandler::begin(wifi_mode_t mode, const char* host_name) {
+	console.log(WIFI_T, "Starting Wi-Fi configuration...");
+	if(mode == WIFI_AP)
+	{
+		IPAddress localIP(192, 168, 4, 1);		// Set your Static IP address
+		IPAddress gatewayAddr(192, 168, 4, 0);	// Set your Gateway IP address
+		IPAddress subnetMask(255, 255, 255, 0);	// Set your Subnet Mask
+
+		console.log(WIFI_T, "Setting AP (Access Point)...");
+		WiFi.mode(WIFI_AP);
+
+		if(!WiFi.softAP(ssid, password, 1, 0, 1, false))
+			console.log(WIFI_T, "AP failed to start");
+        delay(100);
+		if(!WiFi.softAPConfig(localIP, gatewayAddr, subnetMask))
+			console.log(WIFI_T, "AP configuration failed");
+		else
+		{
+			console.log(WIFI_T, "AP started!");
+			console.log(WIFI_T, "Network SSID: " + String(ssid));
+			IPAddress IP = WiFi.softAPIP();
+			console.log(WIFI_T, "AP IP address: " + IP.toString());
+		}
+	}
+	else if(mode == WIFI_STA)
+	{
+		console.log(WIFI_T, "Setting STA (STAtion mode)...");
+		WiFi.mode(WIFI_STA);
+		WiFi.begin(ssid, password);
+	}
+	else
+	{
+		console.log(WIFI_T, "ERROR! Invalid Wi-Fi operating mode");
+	}
+
+    if(MDNS.begin(host_name))
     {
-        delay(500);
-        console.write(WIFI_T, ".");
-        if(millis() - start_wifi_millis > WIFI_TIMEOUT)
-        {
-            WiFi.disconnect(true, true);
-            return false;
-        }
+        MDNS.addService("http", "tcp", 80);
+        console.log(WIFI_T, "MDNS start, open the browser and type \"http://" + String(host_name) + ".local\"");
     }
-    return true;
 }
 
-void scanNetworks(void)
+void WiFiHandler::loop(void) {
+	wl_status_t curr_status = WiFi.status();
+	if(curr_status != status)
+    {
+		wifi_timeout = millis();
+		status = curr_status;
+		switch(status) {
+			case WL_IDLE_STATUS:		console.log(WIFI_T, "Idle status");							break;
+			case WL_NO_SSID_AVAIL:		console.error(WIFI_T, "No SSID available");					break;
+			case WL_SCAN_COMPLETED:		console.success(WIFI_T, "Network scan was completed");		break;
+			case WL_CONNECTED:			console.success(WIFI_T, "Connection was established");		break;
+			case WL_CONNECT_FAILED:		console.error(WIFI_T, "Connection failed");					break;
+			case WL_CONNECTION_LOST:	console.warning(WIFI_T, "Lost connection");					break;
+			case WL_DISCONNECTED:		console.warning(WIFI_T, "Disconnected");					break;
+			default:					console.error(WIFI_T, "Unknown status: " + String(status));	break;
+		}
+    }
+	else
+	{
+		if(curr_status != WL_CONNECTED)
+		{
+			if(millis() - wifi_timeout > WIFI_TIMEOUT) {
+				WiFi.disconnect(true, true);
+				wifi_timeout = millis();
+				console.error(WIFI_T, "Timeout has expired.");
+				WiFi.begin(ssid, password);
+			}
+			else
+				console.log(WIFI_T, "Trying to connect... ");
+		}
+	}
+}
+
+bool WiFiHandler::connected(void) {
+	if(WiFi.status() == WL_CONNECTED)
+		return true;
+
+	return false;
+}
+
+void WiFiHandler::scanNetworks(void)
 {
     console.log(WIFI_T, "Scanning for new networks...");
     int16_t n = WiFi.scanNetworks();
@@ -50,62 +111,5 @@ void scanNetworks(void)
             console.log(WIFI_T, String(i) + ": " + WiFi.SSID(i) + " (" + rssi + " dBm) " + encriptionType);
         }
         console.log(WIFI_T, "Note: networks with \"*\" char are encrypted");
-    }
-}
-
-void initWiFi(wifi_mode_t mode, const char* host_name)
-{
-    console.log(WIFI_T, "Starting Wi-Fi configuration...");
-    if(mode == WIFI_AP)
-    {
-        IPAddress localIP(192, 168, 4, 1);    // Set your Static IP address
-        IPAddress gatewayAddr(192, 168, 4, 0);  // Set your Gateway IP address
-        IPAddress subnetMask(255, 255, 255, 0);   // Set your Subnet Mask
-
-        console.log(WIFI_T, "Setting AP (Access Point)...");
-        WiFi.mode(WIFI_AP);
-
-        if(!WiFi.softAP(ssid, password))
-        {
-            console.log(WIFI_T, "AP failed to start");
-        }
-        delay(100);
-        if(!WiFi.softAPConfig(localIP, gatewayAddr, subnetMask))
-        {
-            console.log(WIFI_T, "AP configuration failed");
-        }
-        else
-        {
-            console.log(WIFI_T, "AP started!");
-            console.log(WIFI_T, "Network SSID: " + String(ssid));
-            IPAddress IP = WiFi.softAPIP();
-            console.log(WIFI_T, "AP IP address: " + IP.toString());
-        }
-    }
-    else if(mode == WIFI_STA)
-    {
-        console.log(WIFI_T, "Setting STA (STAtion mode)...");
-        WiFi.mode(WIFI_STA);
-        while(!checkConnection())
-        {
-            console.log(WIFI_T, "Error: failed to connect.");
-            console.log(WIFI_T, "Connection restart...");
-        }
-        console.log(WIFI_T, "Wi-Fi connected!");
-        console.log(WIFI_T, "Network SSID: " + String(ssid));
-        IPAddress IP = WiFi.localIP();
-        console.log(WIFI_T, "Local IP address: " + IP.toString());
-    }
-    else
-    {
-        console.log(WIFI_T, "ERROR! Invalid Wi-Fi operating mode");
-    }
-
-    //const char* host_name = "esp32";
-
-    if(MDNS.begin(host_name))
-    {
-        MDNS.addService("http", "tcp", 80);
-        console.log(WIFI_T, "MDNS start, open the browser and type \"http://" + String(host_name) + ".local\"");
     }
 }
