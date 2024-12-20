@@ -14,6 +14,7 @@
 #include <mqtt.h>
 #include "def.h"
 #include "credentials.h"
+#include "things5.h"
 
 typedef struct {
     float current;

@@ -3,8 +3,9 @@
 Adafruit_BME280 bme; // I2C
 WiFiHandler wifi_handler(wifi_ssid, wifi_password);
 MqttClient	mqtt_client;
-Timer TimerIdle;
+Timer TimerIdle, TimerMQTT;
 weather_t temperature, pressure, humidity;
+t5_data_t t5_metrics[3];
 
 RgbLed rgb_led(R_LED_PIN, G_LED_PIN, B_LED_PIN, LS_DRIVER);
 
@@ -118,6 +119,26 @@ String getParams(String command) {
 	return msg;
 }
 
+bool freq_flag;
+
+void changeFreq(void)
+{
+	if(freq_flag)
+	{
+		freq_flag = false;
+		ledcChangeFrequency(1, 100, 8);
+		ledcChangeFrequency(2, 200, 8);
+		ledcChangeFrequency(3, 300, 8);
+	}
+	else
+	{
+		freq_flag = true;
+		ledcChangeFrequency(1, 50, 8);
+		ledcChangeFrequency(2, 250, 8);
+		ledcChangeFrequency(3, 1000, 8);
+	}
+}
+
 void setup() {
 	rgb_led.setColor(C8_BLACK);
 	console.header("START INITIALIZATION", DOUBLE_DASHED, 80);
@@ -132,9 +153,21 @@ void setup() {
 	bool status = bme.begin(0x76);
 	initParams();
 	console.header("END INITIALIZATION", DOUBLE_DASHED, 80);
-	btn1.onPress(toggleRedLed);
-	btn2.onPress(toggleBlueLed);
+	//btn1.onPress(toggleRedLed);
+	//btn2.onPress(toggleBlueLed);
+	btn1.onPress(changeFreq);
+	btn2.onPress(changeFreq);
 	rgb_led.setBlink(C8_GREEN, C8_BLACK, 500, 500);
+
+	ledcSetup(0, 200, 8);
+	ledcSetup(1, 600, 8);
+	ledcSetup(2, 450, 8);
+	ledcAttachPin(5, 0);
+	ledcAttachPin(18, 1);
+	ledcAttachPin(19, 2);
+	ledcWrite(0, 127);
+	ledcWrite(1, 127);
+	ledcWrite(2, 127);
 }
 
 void loop() {
@@ -142,11 +175,26 @@ void loop() {
 	btn2.loop();
 	rgb_led.loop();
 
-	if(TimerIdle.elapsedX1ms(50)) {
+	if(TimerIdle.elapsedX1ms(100)) {
 		TimerIdle.trigger();
 		wifi_handler.loop();
 		if(wifi_handler.connected()) {
 			mqtt_client.loop();
+		}
+	}
+
+	if(TimerMQTT.elapsedX1s(5)) {
+		TimerMQTT.trigger();
+		if(mqtt_client.isConnected()) {
+			t5_metrics[0].label = "temperature";
+			t5_metrics[0].value = temperature.current;
+			t5_metrics[1].label = "humidity";
+			t5_metrics[1].value = humidity.current;
+			t5_metrics[2].label = "pressure";
+			t5_metrics[2].value = pressure.current;
+			unsigned long long timestamp = mqtt_client.getTimestamp();
+			String payload = createMetricsPayload(timestamp, t5_metrics, 3);
+			mqtt_client.publish(DATA_INGESTION_REQ, payload);
 		}
 	}
 }
